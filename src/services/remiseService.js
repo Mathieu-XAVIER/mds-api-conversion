@@ -7,13 +7,11 @@
 function validateRemiseParams(prix, pourcentage) {
     const errors = [];
 
-    // Vérification du prix
     const numPrix = parseFloat(prix);
     if (isNaN(numPrix) || numPrix < 0) {
         errors.push('Le prix doit être un nombre positif ou nul');
     }
 
-    // Vérification du pourcentage de remise
     const numPourcentage = parseFloat(pourcentage);
     if (isNaN(numPourcentage) || numPourcentage < 0 || numPourcentage > 100) {
         errors.push('Le pourcentage de remise doit être un nombre entre 0 et 100');
@@ -34,21 +32,19 @@ function validateRemiseParams(prix, pourcentage) {
  * @returns {Object} Résultat du calcul
  */
 function applyRemise(prix, pourcentage) {
-    // Validation des paramètres
     const validation = validateRemiseParams(prix, pourcentage);
     if (!validation.isValid) {
         throw new Error(validation.errors.join(', '));
     }
 
-    // Calcul de la remise
     const montantRemise = (validation.prix * validation.pourcentage) / 100;
     const prixFinal = validation.prix - montantRemise;
 
     return {
         prixInitial: validation.prix,
         pourcentage: validation.pourcentage,
-        montantRemise: Math.round(montantRemise * 100) / 100, // Arrondi à 2 décimales
-        prixFinal: Math.round(prixFinal * 100) / 100 // Arrondi à 2 décimales
+        montantRemise: Math.round(montantRemise * 100) / 100,
+        prixFinal: Math.round(prixFinal * 100) / 100
     };
 }
 
@@ -77,13 +73,11 @@ function calculateRemiseAmount(prix, pourcentage) {
 function applyRemiseFixe(prix, montant) {
     const errors = [];
 
-    // Vérification du prix
     const numPrix = parseFloat(prix);
     if (isNaN(numPrix) || numPrix < 0) {
         errors.push('Le prix doit être un nombre positif ou nul');
     }
 
-    // Vérification du montant de remise
     const numMontant = parseFloat(montant);
     if (isNaN(numMontant) || numMontant < 0) {
         errors.push('Le montant de remise doit être un nombre positif ou nul');
@@ -97,7 +91,6 @@ function applyRemiseFixe(prix, montant) {
         throw new Error(errors.join(', '));
     }
 
-    // Calcul du prix final
     const prixFinal = numPrix - numMontant;
     const pourcentage = numPrix > 0 ? (numMontant / numPrix) * 100 : 0;
 
@@ -118,13 +111,11 @@ function applyRemiseFixe(prix, montant) {
 function calculatePrixOriginal(prixFinal, pourcentage) {
     const errors = [];
 
-    // Vérification du prix final
     const numPrixFinal = parseFloat(prixFinal);
     if (isNaN(numPrixFinal) || numPrixFinal < 0) {
         errors.push('Le prix final doit être un nombre positif ou nul');
     }
 
-    // Vérification du pourcentage
     const numPourcentage = parseFloat(pourcentage);
     if (isNaN(numPourcentage) || numPourcentage < 0 || numPourcentage >= 100) {
         errors.push('Le pourcentage de remise doit être un nombre entre 0 et 99.99');
@@ -134,7 +125,6 @@ function calculatePrixOriginal(prixFinal, pourcentage) {
         throw new Error(errors.join(', '));
     }
 
-    // Calcul du prix original
     const prixInitial = numPrixFinal / (1 - numPourcentage / 100);
     const montantRemise = prixInitial - numPrixFinal;
 

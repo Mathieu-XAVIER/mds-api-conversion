@@ -7,13 +7,11 @@
 function validateTvaParams(ht, taux) {
     const errors = [];
 
-    // Vérification du montant HT
     const numHt = parseFloat(ht);
     if (isNaN(numHt) || numHt < 0) {
         errors.push('Le montant HT doit être un nombre positif ou nul');
     }
 
-    // Vérification du taux de TVA
     const numTaux = parseFloat(taux);
     if (isNaN(numTaux) || numTaux < 0 || numTaux > 100) {
         errors.push('Le taux de TVA doit être un nombre entre 0 et 100');
@@ -34,13 +32,11 @@ function validateTvaParams(ht, taux) {
  * @returns {Object} Résultat du calcul
  */
 function calculateTTC(ht, taux) {
-    // Validation des paramètres
     const validation = validateTvaParams(ht, taux);
     if (!validation.isValid) {
         throw new Error(validation.errors.join(', '));
     }
 
-    // Calcul du montant TTC
     const montantTva = (validation.ht * validation.taux) / 100;
     const ttc = validation.ht + montantTva;
 
@@ -61,13 +57,11 @@ function calculateTTC(ht, taux) {
 function calculateHT(ttc, taux) {
     const errors = [];
 
-    // Vérification du montant TTC
     const numTtc = parseFloat(ttc);
     if (isNaN(numTtc) || numTtc < 0) {
         errors.push('Le montant TTC doit être un nombre positif ou nul');
     }
 
-    // Vérification du taux de TVA
     const numTaux = parseFloat(taux);
     if (isNaN(numTaux) || numTaux < 0 || numTaux > 100) {
         errors.push('Le taux de TVA doit être un nombre entre 0 et 100');
@@ -77,7 +71,6 @@ function calculateHT(ttc, taux) {
         throw new Error(errors.join(', '));
     }
 
-    // Calcul du montant HT
     const ht = numTtc / (1 + numTaux / 100);
     const montantTva = numTtc - ht;
 

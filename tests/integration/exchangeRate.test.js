@@ -4,7 +4,6 @@
 
 const conversionService = require('../../src/services/conversionService');
 
-// Mock d'une API externe de taux de change
 class MockExchangeRateAPI {
     constructor() {
         this.rates = {
@@ -21,7 +20,6 @@ class MockExchangeRateAPI {
             throw new Error('API Service Unavailable');
         }
 
-        // Simulation d'un délai réseau
         if (this.delay > 0) {
             await new Promise(resolve => setTimeout(resolve, this.delay));
         }
@@ -40,7 +38,6 @@ class MockExchangeRateAPI {
         return rates[key];
     }
 
-    // Méthodes pour simuler différents scénarios
     setOffline() {
         this.isOnline = false;
     }
@@ -59,7 +56,6 @@ class MockExchangeRateAPI {
     }
 }
 
-// Service qui utilise l'API mockée
 class ExchangeRateService {
     constructor(apiClient) {
         this.apiClient = apiClient;
@@ -71,16 +67,13 @@ class ExchangeRateService {
         const cacheKey = `${from}_${to}`;
         const cached = this.cache.get(cacheKey);
 
-        // Vérifier le cache
         if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
             return cached.rate;
         }
 
         try {
-            // Appeler l'API
             const rate = await this.apiClient.getRate(from, to);
 
-            // Mettre en cache
             this.cache.set(cacheKey, {
                 rate,
                 timestamp: Date.now()
@@ -88,7 +81,6 @@ class ExchangeRateService {
 
             return rate;
         } catch (error) {
-            // Fallback sur les taux fixes si l'API est indisponible
             console.warn('API unavailable, using fallback rates:', error.message);
             return conversionService.getExchangeRate(from, to);
         }
@@ -142,33 +134,25 @@ describe('Tests d\'intégration - API de taux de change', () => {
         });
 
         test('devrait mettre en cache les taux', async () => {
-            // Premier appel
             const rate1 = await exchangeService.getRate('EUR', 'USD');
 
-            // Modifier le taux dans l'API
             mockAPI.updateRate('EUR', 'USD', 1.2);
 
-            // Deuxième appel - devrait utiliser le cache
             const rate2 = await exchangeService.getRate('EUR', 'USD');
 
             expect(rate1).toBe(1.1);
-            expect(rate2).toBe(1.1); // Même valeur car mise en cache
+            expect(rate2).toBe(1.1);
         });
 
         test('devrait rafraîchir le cache après expiration', async () => {
-            // Configurer un timeout très court pour le test
             exchangeService.cacheTimeout = 10; // 10ms
 
-            // Premier appel
             const rate1 = await exchangeService.getRate('EUR', 'USD');
 
-            // Attendre l'expiration du cache
             await new Promise(resolve => setTimeout(resolve, 20));
 
-            // Modifier le taux dans l'API
             mockAPI.updateRate('EUR', 'USD', 1.2);
 
-            // Deuxième appel - devrait utiliser la nouvelle valeur
             const rate2 = await exchangeService.getRate('EUR', 'USD');
 
             expect(rate1).toBe(1.1);
@@ -178,7 +162,6 @@ describe('Tests d\'intégration - API de taux de change', () => {
 
     describe('Gestion des erreurs et fallback', () => {
         test('devrait utiliser les taux de fallback quand l\'API est hors ligne', async () => {
-            // Mettre l'API hors ligne
             mockAPI.setOffline();
 
             const result = await exchangeService.convertWithExternalAPI('EUR', 'USD', 100);
@@ -188,7 +171,6 @@ describe('Tests d\'intégration - API de taux de change', () => {
         });
 
         test('devrait gérer les timeouts de l\'API', async () => {
-            // Simuler un délai long
             mockAPI.setDelay(1000);
 
             const startTime = Date.now();
@@ -218,17 +200,14 @@ describe('Tests d\'intégration - API de taux de change', () => {
 
             const rates = await Promise.all(promises);
 
-            // Tous les taux devraient être identiques
             rates.forEach(rate => {
                 expect(rate).toBe(1.1);
             });
         });
 
         test('devrait maintenir la performance avec le cache', async () => {
-            // Premier appel pour remplir le cache
             await exchangeService.getRate('EUR', 'USD');
 
-            // Mesurer le temps pour les appels suivants
             const startTime = Date.now();
 
             for (let i = 0; i < 100; i++) {
@@ -238,20 +217,16 @@ describe('Tests d\'intégration - API de taux de change', () => {
             const endTime = Date.now();
             const avgTime = (endTime - startTime) / 100;
 
-            // Avec le cache, chaque appel devrait être très rapide
-            expect(avgTime).toBeLessThan(1); // Moins de 1ms par appel
+            expect(avgTime).toBeLessThan(1);
         });
     });
 
     describe('Intégration avec le service de conversion', () => {
         test('devrait pouvoir basculer entre API externe et service local', async () => {
-            // Conversion avec API externe
             const externalResult = await exchangeService.convertWithExternalAPI('EUR', 'USD', 100);
 
-            // Conversion avec service local
             const localResult = conversionService.convertCurrency('EUR', 'USD', 100);
 
-            // Les résultats devraient être identiques (mêmes taux)
             expect(externalResult.convertedAmount).toBe(localResult.convertedAmount);
             expect(externalResult.rate).toBe(localResult.rate);
         });
@@ -260,7 +235,6 @@ describe('Tests d\'intégration - API de taux de change', () => {
             const eurToUsd = await exchangeService.getRate('EUR', 'USD');
             const usdToGbp = await exchangeService.getRate('USD', 'GBP');
 
-            // Vérifier que EUR -> USD -> GBP est cohérent
             const directRate = eurToUsd * usdToGbp;
             const expectedRate = 1.1 * 0.8; // 0.88
 
@@ -270,11 +244,9 @@ describe('Tests d\'intégration - API de taux de change', () => {
 
     describe('Nettoyage et maintenance', () => {
         test('devrait pouvoir vider le cache', async () => {
-            // Remplir le cache
             await exchangeService.getRate('EUR', 'USD');
             expect(exchangeService.cache.size).toBe(1);
 
-            // Vider le cache
             exchangeService.clearCache();
             expect(exchangeService.cache.size).toBe(0);
         });
@@ -285,12 +257,10 @@ describe('Tests d\'intégration - API de taux de change', () => {
                 ['USD', 'EUR'], ['GBP', 'USD'], ['GBP', 'EUR']
             ];
 
-            // Ajouter les taux manquants au mock
             mockAPI.updateRate('USD', 'EUR', 1/1.1);
             mockAPI.updateRate('GBP', 'USD', 1/0.8);
             mockAPI.updateRate('GBP', 'EUR', 1/0.88);
 
-            // Faire des appels pour toutes les paires
             for (const [from, to] of pairs) {
                 try {
                     await exchangeService.getRate(from, to);
@@ -300,7 +270,6 @@ describe('Tests d\'intégration - API de taux de change', () => {
                 }
             }
 
-            // Le cache ne devrait pas être trop grand
             expect(exchangeService.cache.size).toBeLessThanOrEqual(pairs.length);
         });
     });

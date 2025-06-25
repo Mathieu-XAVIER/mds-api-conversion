@@ -1,10 +1,10 @@
 const EXCHANGE_RATES = {
     'EUR_USD': 1.1,
     'USD_GBP': 0.8,
-    'USD_EUR': 1 / 1.1, // Inverse de EUR_USD
-    'GBP_USD': 1 / 0.8, // Inverse de USD_GBP
-    'EUR_GBP': 1.1 * 0.8, // EUR -> USD -> GBP
-    'GBP_EUR': 1 / (1.1 * 0.8) // Inverse de EUR_GBP
+    'USD_EUR': 1 / 1.1,
+    'GBP_USD': 1 / 0.8,
+    'EUR_GBP': 1.1 * 0.8,
+    'GBP_EUR': 1 / (1.1 * 0.8)
 };
 
 /**
@@ -17,7 +17,6 @@ const EXCHANGE_RATES = {
 function validateConversionParams(from, to, amount) {
     const errors = [];
 
-    // Vérification des devises supportées
     const supportedCurrencies = ['EUR', 'USD', 'GBP'];
 
     if (!from || !supportedCurrencies.includes(from.toUpperCase())) {
@@ -28,7 +27,6 @@ function validateConversionParams(from, to, amount) {
         errors.push('Devise cible invalide. Devises supportées: EUR, USD, GBP');
     }
 
-    // Vérification du montant
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount <= 0) {
         errors.push('Le montant doit être un nombre positif');
@@ -51,7 +49,6 @@ function getExchangeRate(from, to) {
     const fromUpper = from.toUpperCase();
     const toUpper = to.toUpperCase();
 
-    // Même devise
     if (fromUpper === toUpper) {
         return 1;
     }
@@ -74,13 +71,11 @@ function getExchangeRate(from, to) {
  * @returns {Object} Résultat de la conversion
  */
 function convertCurrency(from, to, amount) {
-    // Validation des paramètres
     const validation = validateConversionParams(from, to, amount);
     if (!validation.isValid) {
         throw new Error(validation.errors.join(', '));
     }
 
-    // Conversion
     const rate = getExchangeRate(from, to);
     const convertedAmount = Math.round(validation.amount * rate * 100) / 100; // Arrondi à 2 décimales
 

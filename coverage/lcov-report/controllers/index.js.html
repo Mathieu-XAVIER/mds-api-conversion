@@ -219,16 +219,7 @@
 <a name='L154'></a><a href='#L154'>154</a>
 <a name='L155'></a><a href='#L155'>155</a>
 <a name='L156'></a><a href='#L156'>156</a>
-<a name='L157'></a><a href='#L157'>157</a>
-<a name='L158'></a><a href='#L158'>158</a>
-<a name='L159'></a><a href='#L159'>159</a>
-<a name='L160'></a><a href='#L160'>160</a>
-<a name='L161'></a><a href='#L161'>161</a>
-<a name='L162'></a><a href='#L162'>162</a>
-<a name='L163'></a><a href='#L163'>163</a>
-<a name='L164'></a><a href='#L164'>164</a>
-<a name='L165'></a><a href='#L165'>165</a>
-<a name='L166'></a><a href='#L166'>166</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<a name='L157'></a><a href='#L157'>157</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -239,7 +230,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -249,9 +239,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -277,7 +265,6 @@
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -286,9 +273,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -313,7 +298,6 @@
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -322,9 +306,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -403,21 +385,18 @@ const remiseService = require('../services/remiseService');
  */
 function convertController(req, res) {
     try {
-        const { from, to, amount } = req.query;
+        const {from, to, amount} = req.query;
 &nbsp;
-        // Vérification des paramètres requis
         if (!from || !to || !amount) {
             return res.status(400).json({
                 error: 'Paramètres requis manquants',
                 required: ['from', 'to', 'amount'],
-                received: { from, to, amount }
+                received: {from, to, amount}
             });
         }
 &nbsp;
-        // Conversion
         const result = conversionService.convertCurrency(from, to, amount);
 &nbsp;
-        // Format de réponse selon le cahier des charges
         const response = {
             from: result.from,
             to: result.to,
@@ -440,21 +419,18 @@ function convertController(req, res) {
  */
 function tvaController(req, res) {
     try {
-        const { ht, taux } = req.query;
+        const {ht, taux} = req.query;
 &nbsp;
-        // Vérification des paramètres requis
         if (!ht || !taux) {
             return res.status(400).json({
                 error: 'Paramètres requis manquants',
                 required: ['ht', 'taux'],
-                received: { ht, taux }
+                received: {ht, taux}
             });
         }
 &nbsp;
-        // Calcul TTC
         const result = tvaService.calculateTTC(ht, taux);
 &nbsp;
-        // Format de réponse selon le cahier des charges
         const response = {
             ht: result.ht,
             taux: result.taux,
@@ -476,21 +452,18 @@ function tvaController(req, res) {
  */
 function remiseController(req, res) {
     try {
-        const { prix, pourcentage } = req.query;
+        const {prix, pourcentage} = req.query;
 &nbsp;
-        // Vérification des paramètres requis
         if (!prix || !pourcentage) {
             return res.status(400).json({
                 error: 'Paramètres requis manquants',
                 required: ['prix', 'pourcentage'],
-                received: { prix, pourcentage }
+                received: {prix, pourcentage}
             });
         }
 &nbsp;
-        // Calcul de la remise
         const result = remiseService.applyRemise(prix, pourcentage);
 &nbsp;
-        // Format de réponse selon le cahier des charges
         const response = {
             prixInitial: result.prixInitial,
             pourcentage: result.pourcentage,
@@ -542,7 +515,7 @@ function notFoundController(req, res) {
 /**
  * Middleware de gestion des erreurs
  */
-function errorHandler(err, req, res, next) {
+function errorHandler(err, req, res) {
     console.error('Erreur:', err);
 &nbsp;
     res.status(500).json({
@@ -565,7 +538,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-24T14:42:24.353Z
+                at 2025-06-27T09:33:57.228Z
             </div>
         <script src="../prettify.js"></script>
         <script>

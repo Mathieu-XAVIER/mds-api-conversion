@@ -214,6 +214,54 @@ jobs:
           test -d tests || exit 1
           echo "Application structure is valid"
 
+  # Job de performance
+  performance:
+    name: ⚡ Performance Tests
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start application
+        run: |
+          nohup npm start &
+          sleep 10
+
+      - name: Install Apache Bench
+        run: sudo apt-get update && sudo apt-get install -y apache2-utils
+
+      - name: Run performance tests
+        run: |
+          echo "Running performance tests..."
+          
+          # Test de charge basique - 1000 requêtes avec 10 connexions concurrentes
+          ab -n 1000 -c 10 http://localhost:3000/ > perf_results.txt
+          
+          # Vérifier que le temps de réponse moyen est acceptable (< 100ms)
+          avg_time=$(grep "Time per request:" perf_results.txt | head -1 | awk '{print $4}')
+          if (( $(echo "$avg_time > 100" | bc -l) )); then
+            echo "::warning::Average response time ${avg_time}ms is high"
+          else
+            echo "::notice::Performance OK - Average response time: ${avg_time}ms"
+          fi
+
+      - name: Upload performance results
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-results
+          path: perf_results.txt
+
   # Job de déploiement (exemple)
   deploy:
     name: 🚀 Deploy

@@ -213,15 +213,3 @@ jobs:
           test -d src/controllers || exit 1
           test -d tests || exit 1
           echo "Application structure is valid"
-
-  # Job de nettoyage
-  cleanup:
-    name: 🧹 Cleanup
-    runs-on: ubuntu-latest
-    needs: [notify]
-    if: always()
-    steps:
-      - name: Clean up artifacts
-        run: |
-          echo "Cleaning up temporary files and artifacts..."
-          # Nettoyage si nécessaire
